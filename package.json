@@ -8,8 +8,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "lucide-react": "^0.575.0"
-  }
+  "description": ""
 }
