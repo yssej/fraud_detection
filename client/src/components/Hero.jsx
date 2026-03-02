@@ -4,7 +4,7 @@ const Hero = () => {
     const enterpriseLength = 69;
     const averageLatency = 120;
     return (
-        <section className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
+        <section id="hero" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
             <div className="container mx-auto px-6 py-20 flex flex-col items-center justify-center min-h-screen">
 
                 {/* Badge - Petit élément pour attirer l'attention */}

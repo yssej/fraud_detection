@@ -95,7 +95,7 @@ const HowItWorks = () => {
     };
 
     return (
-        <section className="py-20 bg-white">
+        <section id="how-it-works" className="py-20 bg-white">
             <div className="container mx-auto px-6">
 
                 {/* En-tête */}

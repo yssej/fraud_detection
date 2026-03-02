@@ -50,7 +50,7 @@ const Features = () => {
     ];
 
     return (
-      <section className="py-20 bg-slate-50">
+      <section id="features" className="py-20 bg-slate-50">
           <div className="container mx-auto px-6">
 
               {/* En-tête de section */}
