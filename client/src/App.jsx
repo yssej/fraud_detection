@@ -4,7 +4,7 @@ import HowItWorks from "./components/HowItWorks.jsx";
 import CTA from "./components/CTA.jsx";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./navigation/Navbar.jsx";
-import Login from "./components/Login.jsx";
+import Login from "./pages/Login.jsx";
 
 function App() {
     return (

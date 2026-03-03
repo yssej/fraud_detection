@@ -1,11 +1,13 @@
 const express = require('express');
 const sequelize = require('./config/database');
+const cors = require('cors');
 
 const app = express();
 
 require('dotenv').config()
 
 app.use(express.json());
+app.use(cors({ credentials: true, origin: true }));
 
 const initDb = async () => {
     try {

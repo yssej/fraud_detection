@@ -67,7 +67,10 @@ const refresh = async (token) => {
     const newAccessToken = generateAccessToken({
         id: user.id
     });
-    return { accessToken: newAccessToken }
+    const newRefreshToken = generateRefreshToken({
+        id: user.id
+    })
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
 }
 
 module.exports = { login, register, refresh };

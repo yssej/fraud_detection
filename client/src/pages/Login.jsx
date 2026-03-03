@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
+import {useUser} from "../context/userContext.jsx";
+import authService from "../services/auth.service.js";
+import toast from "react-hot-toast";
 
 const Login = () => {
     // State pour les valeurs du formulaire - Pattern d'objet pour plusieurs inputs
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const { isLoggedIn, setUserState, userData } = useUser();
 
     // State pour les erreurs de validation
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
 
     // State pour afficher/masquer le mot de passe
     const [showPassword, setShowPassword] = useState(false);
@@ -19,92 +20,63 @@ const Login = () => {
 
     // State pour l'erreur générale de connexion
     const [loginError, setLoginError] = useState('');
+    const [redirectToReferrer, setRedirectToReferrer] = useState(false);
 
     // Fonction pour gérer le changement des inputs
     // Pattern professionnel : un seul handler pour tous les inputs
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        // Met à jour la valeur dans formData
-        setFormData(prev => ({
-            ...prev,  // Garde les autres valeurs
-            [name]: value  // Met à jour seulement le champ modifié
-        }));
-
-        // Efface l'erreur du champ dès que l'utilisateur tape
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        watch
+    } = useForm({
+        defaultValues: {
+            emailOrUsername: '',
+            password: ''
         }
-    };
+    });
 
-    // Fonction de validation
-    const validate = () => {
-        const newErrors = {};
-
-        // Validation email
-        if (!formData.email) {
-            newErrors.email = "L'email est requis";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "L'email n'est pas valide";
-        }
-
-        // Validation mot de passe
-        if (!formData.password) {
-            newErrors.password = "Le mot de passe est requis";
-        } else if (formData.password.length < 6) {
-            newErrors.password = "Le mot de passe doit contenir au moins 6 caractères";
-        }
-
-        return newErrors;
-    };
-
-    // Fonction de soumission du formulaire
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Efface l'erreur générale précédente
-        setLoginError('');
-
-        // Valide le formulaire
-        const validationErrors = validate();
-
-        // Si il y a des erreurs, on les affiche et on arrête
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
-        // Simulation d'un appel API
-        setIsLoading(true);
+    const onSubmit = async (data) => {
+        const { emailOrUsername, password } = data;
 
         try {
-            // Ici tu ferais un vrai appel API
-            // const response = await fetch('/api/login', { ... });
-
-            // Simulation avec setTimeout
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Simulation : si l'email contient "test", connexion réussie
-            if (formData.email.includes('test')) {
-                console.log('Connexion réussie !', formData);
-                alert('Connexion réussie ! En production, tu serais redirigé vers le dashboard.');
-                // Ici tu ferais : navigate('/dashboard');
-            } else {
-                // Simulation d'une erreur
-                setLoginError('Email ou mot de passe incorrect');
-            }
-
+            setIsLoading(true);
+            const data = await authService.login(emailOrUsername, password);
+            console.log('data = ', data);
+            toast.success("Connexion réussie !");
+            setTimeout(() => {
+                setUserState(data);
+                setRedirectToReferrer(true);
+                setIsLoading(false);
+            }, 1500)
         } catch (error) {
-            setLoginError('Une erreur est survenue. Veuillez réessayer.');
-            console.error('Erreur de connexion:', error);
-        } finally {
-            // finally s'exécute toujours, même en cas d'erreur
             setIsLoading(false);
+            setLoginError(error.response?.data.message);
+            toast.error(error.response?.data.message);
         }
+    }
+
+    const getStrength = (password) => {
+        let score = 0;
+        if (!password) return score;
+        if (password.length > 6) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        return score; // 0 à 4
     };
+
+    const strength = getStrength(watch('password'));
+
+    // Configuration visuelle
+    const strengthConfig = [
+        { label: 'Très faible', color: 'bg-slate-200', width: '0%' },
+        { label: 'Faible', color: 'bg-red-500', width: '25%' },
+        { label: 'Moyen', color: 'bg-yellow-500', width: '50%' },
+        { label: 'Fort', color: 'bg-green-500', width: '75%' },
+        { label: 'Excellent', color: 'bg-emerald-600', width: '100%' }
+    ];
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-6 py-12">
@@ -132,34 +104,35 @@ const Login = () => {
                     )}
 
                     {/* Formulaire */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
                         {/* Champ Email */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                                Adresse email
+                            <label htmlFor="emailOrUsername" className="block text-sm font-medium text-slate-700 mb-2">
+                                Adresse email ou Nom d'utilisateur
                             </label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                                 <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
+                                    type="text"
+                                    id="username"
+                                    name="emailOrUsername"
+                                    {...register("emailOrUsername", {
+                                        required: true,
+                                    })}
                                     className={`w-full pl-11 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                                        errors.email
+                                        errors.emailOrUsername
                                             ? 'border-red-300 focus:ring-red-500'
                                             : 'border-slate-300 focus:ring-blue-500'
                                     }`}
-                                    placeholder="vous@exemple.com"
+                                    placeholder="Votre email ou nom d'utilisateur"
                                 />
                             </div>
                             {/* Message d'erreur pour l'email */}
-                            {errors.email && (
+                            {errors?.emailOrUsername && errors?.emailOrUsername.type === "required" && (
                                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                                     <AlertCircle className="w-4 h-4" />
-                                    {errors.email}
+                                    Veuillez entrer votre email ou nom d'utilisateur.'
                                 </p>
                             )}
                         </div>
@@ -175,8 +148,14 @@ const Login = () => {
                                     type={showPassword ? 'text' : 'password'}
                                     id="password"
                                     name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
+                                    {...register("password", {
+                                        required: true,
+                                        pattern: {
+                                            value: /^(?=.*[A-Z])(?=.*\d)/,
+                                            message: "Doit inclure au moins une majuscule et un chiffre"
+                                        },
+                                        minLength: 6,
+                                    })}
                                     className={`w-full pl-11 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                         errors.password
                                             ? 'border-red-300 focus:ring-red-500'
@@ -198,10 +177,39 @@ const Login = () => {
                                 </button>
                             </div>
                             {/* Message d'erreur pour le mot de passe */}
-                            {errors.password && (
+                            {errors?.password && errors?.password.type === "required" && (
                                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                                     <AlertCircle className="w-4 h-4" />
-                                    {errors.password}
+                                    Veuillez entrer votre mot de passe.
+                                </p>
+                            )}
+                            {errors?.password && errors?.password.type === "pattern" && (
+                                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                                    <AlertCircle className="w-4 h-4" />
+                                    {errors?.password.message}
+                                </p>
+                            )}
+                            {errors?.password && errors?.password.type === "minLength" && (
+                                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                                    <AlertCircle className="w-4 h-4" />
+                                    Le mot de passe doit contenir au moins 6 caractères.
+                                </p>
+                            )}
+                        </div>
+                        <div className="mt-3">
+                            {/* Barre de progression */}
+                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full transition-all duration-500 ${strengthConfig[strength].color}`}
+                                    style={{ width: strengthConfig[strength].width }}
+                                ></div>
+                            </div>
+
+                            {/* Libellé de force */}
+                            {watch('password') && (
+                                <p className="text-xs mt-1 text-slate-500 flex justify-between">
+                                    <span>Force : <strong>{strengthConfig[strength].label}</strong></span>
+                                    {strength < 3 && <span>Ajoutez des chiffres ou symboles</span>}
                                 </p>
                             )}
                         </div>
