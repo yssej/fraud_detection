@@ -1,7 +1,9 @@
 const bcrypt = require("bcrypt");
-const { generateAccessToken, generateRefreshToken } = require("../utils/jwt");
+const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt");
 const BadRequestError = require("../middlewares/errors/BadRequestError");
+const UnauthorizedError = require('../middlewares/errors/UnauthorizedError');
 const { User} = require("../models/Membership");
+const { RefreshToken } = require("../models/index");
 const { Op } = require('sequelize');
 
 const login = async (emailOrUsername, password) => {
@@ -24,6 +26,11 @@ const login = async (emailOrUsername, password) => {
     const refreshToken = generateRefreshToken({
         id: user.id
     });
+    await RefreshToken.create({
+        token: refreshToken,
+        userId: user.id,
+        expiredAt: new Date(Date.now() + 5*24*60*60*1000)
+    })
     return { user, accessToken, refreshToken };
 }
 
@@ -50,4 +57,20 @@ const register = async (user) => {
     User.create(user);
 }
 
-module.exports = { login, register };
+const refresh = async (token) => {
+    if(!token) throw new UnauthorizedError('RefreshToken is required.');
+    const storedToken = await RefreshToken.findOne({where: {token}});
+    if(!storedToken) throw new UnauthorizedError("Invalid refresh token.");
+    if(storedToken.expiredAt < new Date()) throw new UnauthorizedError("Refresh token expired.");
+    const decoded = verifyRefreshToken(storedToken);
+    const user = await User.findByPk(decoded.id);
+    const newAccessToken = generateAccessToken({
+        id: user.id
+    });
+    const newRefreshToken = generateRefreshToken({
+        id: user.id
+    })
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+}
+
+module.exports = { login, register, refresh };

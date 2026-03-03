@@ -5,6 +5,7 @@ const router = require('express').Router();
 
  router.route('/').get(authMiddleware, getAllUsers);
  router.route('/:id').get(getUserById);
+ router.route('/profile').get(authMiddleware, getUserById)
  router.route('/:id').delete(deleteUserById);
 
  module.exports = router;

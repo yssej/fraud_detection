@@ -1,9 +1,22 @@
-const App = () => {
-    const title = "Hello world!";
+import Hero from './components/Hero.jsx';
+import Features from "./components/Features.jsx";
+import HowItWorks from "./components/HowItWorks.jsx";
+import CTA from "./components/CTA.jsx";
+import Footer from "./components/Footer.jsx";
+import Navbar from "./navigation/Navbar.jsx";
+import Login from "./pages/Login.jsx";
+
+function App() {
     return (
-        <div className="bg-red-300 w-full h-screen flex items-center justify-center">
-            <h1 className="font-bold text-2xl">{title}</h1>
-        </div>
+        <Login />
+        // <div className="min-h-screen">
+        //     <Navbar />
+        //     <Hero />
+        //     <Features />
+        //     <HowItWorks />
+        //     <CTA />
+        //     <Footer />
+        // </div>
     )
 }
 
