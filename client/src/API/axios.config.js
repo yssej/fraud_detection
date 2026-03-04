@@ -6,8 +6,8 @@ const API = axios.create({baseURL, withCredentials: true});
 
 API.interceptors.request.use(
     function (req) {
-        const token = JSON.parse(localStorage.getItem('RISK_MONITOR_token'));
-        if(token) req.headers['auth-token'] = token;
+        const token = localStorage.getItem('RISK_MONITOR_token');
+        if(token) req.headers['authorization'] = 'Bearer '+token;
         return req;
     },
     function (error) {

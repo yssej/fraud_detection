@@ -5,10 +5,14 @@ import CTA from "./components/CTA.jsx";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./navigation/Navbar.jsx";
 import Login from "./pages/Login.jsx";
+import {Toaster} from "react-hot-toast";
 
 function App() {
     return (
-        <Login />
+        <div className="min-h-screen">
+            <Toaster position="top-right" />
+            <Login />
+        </div>
         // <div className="min-h-screen">
         //     <Navbar />
         //     <Hero />

@@ -34,8 +34,6 @@ const login = async (emailOrUsername, password) => {
     return { user, accessToken, refreshToken };
 }
 
-
-
 const isEmailTaken = async (email) => {
     const user = await User.findOne({where: {email}});
     return !!user;

@@ -12,7 +12,9 @@ const WithAxios = ({children}) => {
                 (response) => response,
                 async (error) => {
                     const originalRequest = error.config;
-                    if(error.response.status === 401 && originalRequest.url === '/auth/refresh') {
+                    console.log('error', error.response);
+                    if(error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
+                        console.log('Refresh token expired ', error.response?.status);
                         return new Promise((resolve, reject) => {
                             setIsLoggedIn(false);
                             setUserData(null);
@@ -22,7 +24,8 @@ const WithAxios = ({children}) => {
                         })
                     }
 
-                    if(error.response.status === 401 && !originalRequest._retry) {
+                    if(error.response?.status === 401 && !originalRequest._retry) {
+                        console.log('Refresh token expired ', originalRequest._retry);
                         try {
                             originalRequest._retry = true;
                             const response = await API.post('/auth/refresh', {
