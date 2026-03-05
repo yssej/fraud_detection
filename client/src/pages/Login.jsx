@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
 import {useUser} from "../context/userContext.jsx";
 import authService from "../services/auth.service.js";
 import toast from "react-hot-toast";
+import {Link} from "react-router-dom";
 
 const Login = () => {
     // State pour les valeurs du formulaire - Pattern d'objet pour plusieurs inputs
@@ -264,9 +265,9 @@ const Login = () => {
                     {/* Lien vers l'inscription */}
                     <p className="mt-6 text-center text-sm text-slate-600">
                         Vous n'avez pas de compte ?{' '}
-                        <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+                        <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
                             Créer un compte
-                        </a>
+                        </Link>
                     </p>
 
                     {/* Bouton retour vers landing page */}
