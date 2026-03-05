@@ -85,7 +85,7 @@ const Login = () => {
 
                 {/* Carte de connexion */}
                 <div className="bg-white rounded-2xl shadow-2xl p-8">
-                    <button onClick={() => logout()} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">Logout</button>
+                    {isLoggedIn && <button onClick={() => logout()} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">Logout</button>}
 
                     {/* En-tête */}
                     <div className="text-center mb-8">

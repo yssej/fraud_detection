@@ -28,13 +28,11 @@ const WithAxios = ({children}) => {
                         console.log('Refresh token expired ', originalRequest._retry);
                         try {
                             originalRequest._retry = true;
-                            const response = await API.post('/auth/refresh', {
-                                refreshToken: localStorage.getItem('RISK_MONITOR_refreshToken')
-                            });
+                            const response = await API.post('/auth/refresh');
                             const { accessToken, refreshToken } = response.data;
-                            localStorage.setItem('RISK_MONITOR_accessToken', accessToken);
-                            localStorage.setItem('RISK_MONITOR_refreshToken', refreshToken);
-                            API.defaults.headers['auth-token'] = accessToken;
+                            // localStorage.setItem('RISK_MONITOR_accessToken', accessToken);
+                            // localStorage.setItem('RISK_MONITOR_refreshToken', refreshToken);
+                            // API.defaults.headers['auth-token'] = accessToken;
                             return API(originalRequest);
                         } catch (error) {
                             setIsLoggedIn(false);

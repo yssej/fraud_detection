@@ -10,8 +10,8 @@ class AuthService {
         return await API.get('/users/profile');
     }
 
-    logout() {
-        localStorage.removeItem('RISK_MONITOR_token');
+    async logout() {
+        return await API.post('/auth/logout');
     }
 }
 export default new AuthService();

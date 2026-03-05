@@ -1,7 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import authService from "../services/auth.service.js";
 import WithAxios from "../helpers/WithAxios.js";
-import toast from "react-hot-toast";
 
 const UserContext = createContext();
 
@@ -37,11 +36,11 @@ const UserProvider = ({children}) => {
         // localStorage.setItem('RISK_MONITOR_token', accessToken);
     }
 
-    const logout = () => {
+    const logout = async () => {
         setUserData(null);
         setAuthData(null);
         setIsLoggedIn(false);
-        authService.logout();
+        await authService.logout();
     };
 
     return (

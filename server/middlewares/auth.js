@@ -1,12 +1,16 @@
-const { verifyAccessToken } = require("../utils/jwt");
+const { verifyAccessToken, verifyRefreshToken} = require("../utils/jwt");
 const UnauthorizedError = require("../middlewares/errors/UnauthorizedError");
 const asyncHandler = require("./asyncHandler")
 
 const authMiddleware = asyncHandler(async(req, res, next) => {
     const accessToken = req.cookies.accessToken;
     if(!accessToken) throw new UnauthorizedError("Authentification is required");
-    req.user = verifyAccessToken(accessToken);
-    next();
+    try {
+        req.user = verifyAccessToken(accessToken);
+        next();
+    } catch (error) {
+        throw new UnauthorizedError("Invalid access token");
+    }
 
     // const authHeader = req.headers.authorization;
     // if(!authHeader || !authHeader.startsWith("Bearer ")) throw new UnauthorizedError("Authentification is required");
@@ -16,4 +20,15 @@ const authMiddleware = asyncHandler(async(req, res, next) => {
     // next();
 });
 
-module.exports = authMiddleware;
+const refreshMiddleware = asyncHandler(async(req, res, next) => {
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken) throw new UnauthorizedError("Authentification is required because of refresh token");
+    try {
+        req.user = verifyRefreshToken(refreshToken);
+        next();
+    } catch (error) {
+        throw new UnauthorizedError("Invalid refresh token");
+    }
+})
+
+module.exports = {authMiddleware, refreshMiddleware};

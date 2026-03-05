@@ -4,15 +4,15 @@ const baseURL = import.meta.env.PROD ? import.meta.env.VITE_API_URL : 'http://lo
 
 const API = axios.create({baseURL, withCredentials: true});
 
-API.interceptors.request.use(
-    function (req) {
-        const token = localStorage.getItem('RISK_MONITOR_token');
-        if(token) req.headers['authorization'] = 'Bearer '+token;
-        return req;
-    },
-    function (error) {
-        return Promise.reject(error);
-    }
-);
+// API.interceptors.request.use(
+//     function (req) {
+//         const token = localStorage.getItem('RISK_MONITOR_token');
+//         if(token) req.headers['authorization'] = 'Bearer '+token;
+//         return req;
+//     },
+//     function (error) {
+//         return Promise.reject(error);
+//     }
+// );
 
 export default API;

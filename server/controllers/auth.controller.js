@@ -10,16 +10,17 @@ const loginUser = asyncHandler(async (req, res, next) => {
         httpOnly: true,
         secure: true, // Uniquement via HTTPS
         sameSite: 'Strict', // Protection contre le CSRF
-        maxAge: 15 * 60 * 1000 // 15 minutes
+        maxAge: parseInt(process.env.JWT_SECRET_DURATION_IN_MINUTE) * 60 * 1000 // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'Strict',
-        path: '/auth/refresh', // Sécurité extra : envoyé uniquement sur la route de refresh
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 jours
+        path: '/api/auth/refresh', // Sécurité extra : envoyé uniquement sur la route de refresh
+        maxAge: 2 * 60 * 1000 // 7 jours
     });
+
     res.json({
         user: serializeUser(user),
     })
@@ -33,16 +34,24 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshToken = asyncHandler(async (req, res, next) => {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies.refreshToken;
     res.clearCookie('accessToken');
-    const newAccessToken = await authService.refresh(refreshToken);
-    res.cookie('accessToken', newAccessToken, {
+    const { accessToken } = await authService.refresh(refreshToken);
+    res.cookie('accessToken', accessToken, {
         httpOnly: true,
         secure: true, // Uniquement via HTTPS
         sameSite: 'Strict', // Protection contre le CSRF
-        maxAge: 15 * 60 * 1000 // 15 minutes
+        maxAge: parseInt(process.env.JWT_SECRET_DURATION_IN_MINUTE) * 60 * 1000
     });
     res.json({"message": "Access token refreshed successfully"});
 })
 
-module.exports = { loginUser, registerUser, refreshToken };
+const logoutUser = asyncHandler(async (req, res, next) => {
+    const {id} = req.user;
+    await authService.logout(id);
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.json({"message": "User logged out successfully"});
+})
+
+module.exports = { loginUser, registerUser, refreshToken, logoutUser };

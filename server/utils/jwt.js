@@ -3,13 +3,13 @@ const UnauthorizedError = require("../middlewares/errors/UnauthorizedError");
 
 const generateAccessToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "15m",
+        expiresIn: process.env.JWT_SECRET_DURATION_IN_MINUTE+"m",
     })
 }
 
 const generateRefreshToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_REFRESH_TOKEN, {
-        expiresIn: "5d"
+        expiresIn: process.env.JWT_REFRESH_TOKEN_DURATION_IN_DAYS+"d"
     })
 }
 
@@ -22,6 +22,7 @@ const verifyAccessToken = (token) => {
 }
 
 const verifyRefreshToken = (token) => {
+    if(!token) throw new UnauthorizedError("Refresh token is required");
     try {
         return jwt.verify(token, process.env.JWT_REFRESH_TOKEN);
     }
