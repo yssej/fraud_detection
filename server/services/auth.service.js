@@ -34,8 +34,6 @@ const login = async (emailOrUsername, password) => {
     return { user, accessToken, refreshToken };
 }
 
-
-
 const isEmailTaken = async (email) => {
     const user = await User.findOne({where: {email}});
     return !!user;
@@ -61,16 +59,21 @@ const refresh = async (token) => {
     if(!token) throw new UnauthorizedError('RefreshToken is required.');
     const storedToken = await RefreshToken.findOne({where: {token}});
     if(!storedToken) throw new UnauthorizedError("Invalid refresh token.");
-    if(storedToken.expiredAt < new Date()) throw new UnauthorizedError("Refresh token expired.");
-    const decoded = verifyRefreshToken(storedToken);
+    if(storedToken.expiredAt < new Date()) {
+        await RefreshToken.destroy({where: {token}});
+        throw new UnauthorizedError("Refresh token expired.");
+    }
+    const refresh = storedToken.token;
+    const decoded = verifyRefreshToken(refresh);
     const user = await User.findByPk(decoded.id);
     const newAccessToken = generateAccessToken({
         id: user.id
     });
-    const newRefreshToken = generateRefreshToken({
-        id: user.id
-    })
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+    return { accessToken: newAccessToken }
 }
 
-module.exports = { login, register, refresh };
+const logout = async (id) => {
+    await RefreshToken.destroy({where: {id}});
+}
+
+module.exports = { login, register, refresh, logout };

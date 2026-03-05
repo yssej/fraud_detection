@@ -12,7 +12,9 @@ const WithAxios = ({children}) => {
                 (response) => response,
                 async (error) => {
                     const originalRequest = error.config;
-                    if(error.response.status === 401 && originalRequest.url === '/auth/refresh') {
+                    console.log('error', error.response);
+                    if(error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
+                        console.log('Refresh token expired ', error.response?.status);
                         return new Promise((resolve, reject) => {
                             setIsLoggedIn(false);
                             setUserData(null);
@@ -22,16 +24,15 @@ const WithAxios = ({children}) => {
                         })
                     }
 
-                    if(error.response.status === 401 && !originalRequest._retry) {
+                    if(error.response?.status === 401 && !originalRequest._retry) {
+                        console.log('Refresh token expired ', originalRequest._retry);
                         try {
                             originalRequest._retry = true;
-                            const response = await API.post('/auth/refresh', {
-                                refreshToken: localStorage.getItem('RISK_MONITOR_refreshToken')
-                            });
+                            const response = await API.post('/auth/refresh');
                             const { accessToken, refreshToken } = response.data;
-                            localStorage.setItem('RISK_MONITOR_accessToken', accessToken);
-                            localStorage.setItem('RISK_MONITOR_refreshToken', refreshToken);
-                            API.defaults.headers['auth-token'] = accessToken;
+                            // localStorage.setItem('RISK_MONITOR_accessToken', accessToken);
+                            // localStorage.setItem('RISK_MONITOR_refreshToken', refreshToken);
+                            // API.defaults.headers['auth-token'] = accessToken;
                             return API(originalRequest);
                         } catch (error) {
                             setIsLoggedIn(false);

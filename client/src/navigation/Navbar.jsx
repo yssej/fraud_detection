@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     // State pour le menu mobile (ouvert/fermé)
@@ -104,12 +105,16 @@ const Navbar = () => {
 
                     {/* Boutons Auth Desktop - Cachés sur mobile */}
                     <div className="hidden md:flex items-center space-x-4">
-                        <button className="px-6 py-2 text-white hover:text-blue-400 transition-colors duration-200 font-medium">
-                            Se connecter
-                        </button>
-                        <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105">
-                            S'inscrire
-                        </button>
+                        <Link to="/login">
+                            <button className="px-6 py-2 text-white hover:text-blue-400 transition-colors duration-200 font-medium">
+                                Se connecter
+                            </button>
+                        </Link>
+                        <Link to="/register">
+                            <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105">
+                                S'inscrire
+                            </button>
+                        </Link>
                     </div>
 
                     {/* Bouton Menu Mobile - Visible uniquement sur mobile */}
@@ -148,12 +153,19 @@ const Navbar = () => {
 
                         {/* Boutons Auth mobile */}
                         <div className="pt-4 border-t border-slate-700 space-y-3 px-4">
-                            <button className="w-full px-6 py-3 text-white hover:bg-white/5 border border-slate-600 rounded-lg font-medium transition-all duration-200">
-                                Se connecter
-                            </button>
-                            <button className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg">
-                                S'inscrire
-                            </button>
+                            <Link to="/login" className="block text-slate-200 hover:text-blue-400 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+                                <button className="w-full px-6 py-3 text-white hover:bg-white/5 border border-slate-600 rounded-lg font-medium transition-all duration-200">
+                                    Se connecter
+                                </button>
+                            </Link>
+                            <Link to="/register" className="block text-slate-200 hover:text-blue-400 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+                                <button
+                                    className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+                                font-medium transition-all duration-200 shadow-lg"
+                                >
+                                    S'inscrire
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

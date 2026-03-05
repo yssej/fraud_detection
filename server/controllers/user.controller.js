@@ -3,12 +3,14 @@ const asyncHandler = require('../middlewares/asyncHandler')
 const serializeUser = require('../utils/user.serializer');
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
+    console.log(req.user);
     const users = await userService.getAll();
     res.json(users.map(serializeUser));
 });
 
 const getUserById = asyncHandler(async (req, res, next) => {
-    const user = await userService.getById(req.params.id);
+    const {id} = req.params.id;
+    const user = await userService.getById(id);
     res.json(serializeUser(user));
 });
 

@@ -18,29 +18,29 @@ const UserProvider = ({children}) => {
     }, [isLoggedIn]);
 
     useEffect(() => {
-       if(localStorage.getItem('RISK_MONITOR_token')){
-           setIsLoggedIn(true);
-           setAuthData({
-               token: localStorage.getItem('RISK_MONITOR_token')
-           })
-       }
+        if(authData.token){
+            setIsLoggedIn(true);
+            // setAuthData({
+            //     token: localStorage.getItem('RISK_MONITOR_token')
+            // })
+        }
     }, []);
 
     const setUserInfo = (data) => {
-       const { user, token } = data;
-       setIsLoggedIn(true);
-       setUserData(user);
-       setAuthData({
-           token: token
-       });
-       localStorage.setItem('RISK_MONITOR_token', token);
+        const { user, accessToken } = data;
+        setIsLoggedIn(true);
+        setUserData(user);
+        setAuthData({
+           token: accessToken
+        });
+        // localStorage.setItem('RISK_MONITOR_token', accessToken);
     }
 
-    const logout = () => {
+    const logout = async () => {
         setUserData(null);
         setAuthData(null);
         setIsLoggedIn(false);
-        authService.logout();
+        await authService.logout();
     };
 
     return (
