@@ -6,6 +6,10 @@ class AuthService {
         return data;
     }
 
+    async register(newUser) {
+        return await API.post('/auth/register', newUser);
+    }
+
     async getCurrentUser() {
         return await API.get('/users/profile');
     }

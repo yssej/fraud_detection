@@ -18,6 +18,18 @@ const getUserProfile = asyncHandler(async (req, res, next) => {
     const {id} = req.user;
     const user = await userService.getById(id);
     res.json(serializeUser(user));
+});
+
+const isEmailTaken = asyncHandler(async (req, res, next) => {
+    const {email} = req.params;
+    const isTaken = await userService.isEmailTaken(email);
+    res.json({isTaken});
+});
+
+const isUsernameTaken = asyncHandler(async (req, res, next) => {
+    const {username} = req.params;
+    const isTaken = await userService.isUsernameTaken(username);
+    res.json({isTaken});
 })
 
 const deleteUserById = asyncHandler(async (req, res,next) => {
@@ -26,4 +38,4 @@ const deleteUserById = asyncHandler(async (req, res,next) => {
     res.json({"message": "User deleted successfully!"});
 });
 
-module.exports = {getAllUsers, getUserById, getUserProfile, deleteUserById};
+module.exports = {getAllUsers, getUserById, getUserProfile, deleteUserById, isEmailTaken, isUsernameTaken};
