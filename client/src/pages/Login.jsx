@@ -31,6 +31,7 @@ const Login = () => {
         formState: { errors },
         watch
     } = useForm({
+        mode: 'onChange',
         defaultValues: {
             emailOrUsername: '',
             password: ''
@@ -135,7 +136,7 @@ const Login = () => {
                             {errors?.emailOrUsername && errors?.emailOrUsername.type === "required" && (
                                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                                     <AlertCircle className="w-4 h-4" />
-                                    Veuillez entrer votre email ou nom d'utilisateur.'
+                                    Veuillez entrer votre email ou nom d'utilisateur.
                                 </p>
                             )}
                         </div>
