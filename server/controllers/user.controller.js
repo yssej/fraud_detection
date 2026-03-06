@@ -26,10 +26,16 @@ const isEmailTaken = asyncHandler(async (req, res, next) => {
     res.json({isTaken});
 });
 
+const isUsernameTaken = asyncHandler(async (req, res, next) => {
+    const {username} = req.params;
+    const isTaken = await userService.isUsernameTaken(username);
+    res.json({isTaken});
+})
+
 const deleteUserById = asyncHandler(async (req, res,next) => {
     const {id} = req.params;
     await userService.deleteById(id);
     res.json({"message": "User deleted successfully!"});
 });
 
-module.exports = {getAllUsers, getUserById, getUserProfile, deleteUserById, isEmailTaken};
+module.exports = {getAllUsers, getUserById, getUserProfile, deleteUserById, isEmailTaken, isUsernameTaken};

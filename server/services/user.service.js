@@ -16,9 +16,14 @@ const isEmailTaken = async (email) => {
     return user > 0;
 }
 
+const isUsernameTaken = async (username) => {
+    const user = await User.count({where: {username}})
+    return user > 0;
+}
+
 const deleteById = async (id) => {
     await getById(id);
     await User.destroy({where: {id}});
 }
 
-module.exports = {getAll, getById, deleteById, isEmailTaken};
+module.exports = {getAll, getById, deleteById, isEmailTaken, isUsernameTaken};
