@@ -1,15 +1,39 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useRef, useState} from "react";
 import authService from "../services/auth.service.js";
 import WithAxios from "../helpers/WithAxios.js";
 
 const UserContext = createContext();
 
 const UserProvider = ({children}) => {
+    const [isLoading, setIsLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userData, setUserData] = useState(null);
-    const [authData, setAuthData] = useState({
-       token: "",
-    });
+    const hasChecked = useRef(false);
+
+    useEffect(() => {
+        if (hasChecked.current) return;
+        if(localStorage.getItem("isLoggedIn") === "true") {
+            setIsLoggedIn(true);
+            setIsLoading(false);
+            const checkAuth = async () => {
+                try {
+                    // Imaginons que tu vérifies le token ici
+                    const res = await authService.getCurrentUser();
+                    if (res?.data) {
+                        setUserData(res.data);
+                        setIsLoggedIn(true);
+                    }
+                } catch (err) {
+                    console.error("Access token expired or invalid");
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            checkAuth();
+            hasChecked.current = true;
+        }
+        setIsLoading(false);
+    }, [])
 
     useEffect(() => {
         if(isLoggedIn){
@@ -17,42 +41,31 @@ const UserProvider = ({children}) => {
         }
     }, [isLoggedIn]);
 
-    useEffect(() => {
-        if(authData.token){
-            setIsLoggedIn(true);
-            // setAuthData({
-            //     token: localStorage.getItem('RISK_MONITOR_token')
-            // })
-        }
-    }, []);
-
     const setUserInfo = (data) => {
-        const { user, accessToken } = data;
+        const { user } = data;
         setIsLoggedIn(true);
         setUserData(user);
-        setAuthData({
-           token: accessToken
-        });
-        // localStorage.setItem('RISK_MONITOR_token', accessToken);
+        localStorage.setItem("isLoggedIn", "true");
     }
 
     const logout = async () => {
+        setIsLoading(true);
         setUserData(null);
-        setAuthData(null);
         setIsLoggedIn(false);
         await authService.logout();
+        localStorage.setItem("isLoggedIn", "false");
+        setIsLoading(false);
     };
 
     return (
        <UserContext.Provider
            value={{
+               isLoading,
                isLoggedIn,
                setIsLoggedIn,
                userData,
                setUserData,
                setUserState: (data) => setUserInfo(data),
-               authData,
-               setAuthData,
                logout
        }}>
         <WithAxios>{children}</WithAxios>

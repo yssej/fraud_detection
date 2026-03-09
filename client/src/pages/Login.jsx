@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, User } from 'lucide-react';
 import {useUser} from "../context/userContext.jsx";
 import authService from "../services/auth.service.js";
 import toast from "react-hot-toast";
-import {Link} from "react-router-dom";
+import {Link, Navigate, useLocation} from "react-router-dom";
 
 const Login = () => {
     // State pour les valeurs du formulaire - Pattern d'objet pour plusieurs inputs
-    const { isLoggedIn, setUserState, userData, logout } = useUser();
-
-    // State pour les erreurs de validation
-    // const [errors, setErrors] = useState({});
+    const { isLoggedIn, setUserState, logout } = useUser();
 
     // State pour afficher/masquer le mot de passe
     const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +19,7 @@ const Login = () => {
     // State pour l'erreur générale de connexion
     const [loginError, setLoginError] = useState('');
     const [redirectToReferrer, setRedirectToReferrer] = useState(false);
+    const { state } = useLocation();
 
     // Fonction pour gérer le changement des inputs
     // Pattern professionnel : un seul handler pour tous les inputs
@@ -50,7 +48,6 @@ const Login = () => {
                 setUserState(data);
                 setRedirectToReferrer(true);
                 setIsLoading(false);
-                console.log('isLoggedIn = ', isLoggedIn);
             }, 1500)
         } catch (error) {
             setIsLoading(false);
@@ -80,6 +77,12 @@ const Login = () => {
         { label: 'Excellent', color: 'bg-emerald-600', width: '100%' }
     ];
 
+    if (redirectToReferrer) {
+        return <Navigate to={state?.from || "/dashboard"} />;
+    }
+    if (isLoggedIn) {
+        return <Navigate to={state?.from || "/dashboard"} />;
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-6 py-12">
