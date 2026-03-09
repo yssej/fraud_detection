@@ -24,7 +24,7 @@ const UserProvider = ({children}) => {
                         setIsLoggedIn(true);
                     }
                 } catch (err) {
-                    console.error("Session non valide ou inexistante");
+                    console.error("Access token expired or invalid");
                 } finally {
                     setIsLoading(false);
                 }
@@ -53,6 +53,7 @@ const UserProvider = ({children}) => {
         setUserData(null);
         setIsLoggedIn(false);
         await authService.logout();
+        localStorage.setItem("isLoggedIn", "false");
         setIsLoading(false);
     };
 

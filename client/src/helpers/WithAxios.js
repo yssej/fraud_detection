@@ -4,7 +4,7 @@
     import history from "./history.js";
 
     const WithAxios = ({children}) => {
-        const { setIsLoggedIn, setUserData, setAuthData, isLoggedIn, isLoading } = useUser();
+        const { setIsLoggedIn, setUserData, isLoggedIn, isLoading } = useUser();
 
         useMemo(() => {
             if(!isLoading && isLoggedIn) {
@@ -14,10 +14,10 @@
                         const originalRequest = error.config;
                         if(error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
                             console.log('Refresh token expired ', error.response?.status);
+                            localStorage.setItem('isLoggedIn', 'false');
                             return new Promise((resolve, reject) => {
                                 setIsLoggedIn(false);
                                 setUserData(null);
-                                setAuthData(null);
                                 history.push('/login');
                                 reject(error);
                             })
@@ -36,7 +36,6 @@
                             } catch (error) {
                                 setIsLoggedIn(false);
                                 setUserData(null);
-                                setAuthData(null);
                                 history.push('/login');
                             }
                         }
@@ -44,7 +43,7 @@
                     }
                 )
             }
-        }, [isLoggedIn, setIsLoggedIn, setUserData, setAuthData]);
+        }, [isLoggedIn, setIsLoggedIn, setUserData]);
 
         return children;
     }

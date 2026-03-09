@@ -141,7 +141,6 @@ const Register = () => {
                                         validate: {
                                             isUnique: async (v) => {
                                                 const { data } = await userService.isUsernameExist(v);
-                                                console.log('data = ', data);
                                                 return !data.isTaken || 'Ce nom d\'utilisateur existe déjà.';
                                             }
                                         }

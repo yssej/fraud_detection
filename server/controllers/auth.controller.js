@@ -18,7 +18,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
         secure: true,
         sameSite: 'Strict',
         path: '/api/auth/refresh', // Sécurité extra : envoyé uniquement sur la route de refresh
-        maxAge: 2 * 60 * 1000 // 7 jours
+        maxAge: parseInt(process.env.JWT_REFRESH_TOKEN_DURATION_IN_DAYS) * 24 * 60 * 60 * 1000 // 7 jours
     });
 
     res.json({
@@ -34,6 +34,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshToken = asyncHandler(async (req, res, next) => {
+    console.log('Token refresh')
     const refreshToken = req.cookies.refreshToken;
     res.clearCookie('accessToken');
     const { accessToken } = await authService.refresh(refreshToken);
