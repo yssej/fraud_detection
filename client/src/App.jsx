@@ -8,6 +8,12 @@ import Spinner from "./components/Spinner.jsx";
 import Navbar from "./navigation/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import Draft from "./pages/Draft.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import {ProtectedRoute} from "./routes/Protected.route.jsx";
+import DashboardHome from "./pages/Dashboard/DashboardHome.jsx";
+import RiskPage from "./pages/Dashboard/RiskPage.jsx";
+import ProfilePage from "./pages/Dashboard/ProfilePage.jsx";
+import DashboardLayout from "./layouts/DashboardLayout.jsx";
 
 
 
@@ -28,6 +34,17 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/draft" element={<Draft />} />
+                <Route path="*" element={<NotFound />} />
+
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/dashboard" element={<DashboardLayout />}>
+                        {/* Les routes enfants sont placées DIRECTEMENT ici */}
+                        <Route index element={<DashboardHome />} />
+                        <Route path="risk" element={<RiskPage />} />
+                        <Route path="profiles" element={<ProfilePage />} /> {/* Parenthèse fermée + path relatif */}
+                        <Route path="*" element={<NotFound />} />
+                    </Route>
+                </Route>
             </Routes>
         </Suspense>
     )
