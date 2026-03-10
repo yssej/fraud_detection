@@ -3,6 +3,8 @@ import { useUser } from '../../context/userContext.jsx';
 import { TrendingUp, AlertTriangle, CheckCircle, Activity } from 'lucide-react';
 import OrganizationModal from '../../components/OrganizationModal';
 import membershipService from "../../services/membership.service.js";
+import organizationService from "../../services/organization.service.js";
+import toast from "react-hot-toast";
 
 const DashboardHome = () => {
     const { userData } = useUser();
@@ -22,16 +24,15 @@ const DashboardHome = () => {
         setIsCheckingOrg(true);
 
         try {
-            // Ici tu ferais un vrai appel API
             const response = await membershipService.isUserMemberOfAnyOrganization();
-            const {hasOrganisation} = await response.data;
-            setUserHasOrganization(hasOrganisation);
-            if (!hasOrganisation) {
+            const {hasOrganization} = await response.data;
+            setUserHasOrganization(hasOrganization);
+            if (!hasOrganization) {
                 setShowOrgModal(true);
             }
 
         } catch (error) {
-            console.error('Erreur lors de la vérification de l\'organisation:', error);
+            toast.error('Erreur lors de la vérification de l\'organisation:', error);
             setUserHasOrganization(false);
         } finally {
             setIsCheckingOrg(false);
@@ -44,33 +45,17 @@ const DashboardHome = () => {
             console.log('Création de l\'organisation:', orgName);
 
             // Ici tu ferais un appel API pour créer l'organisation
-            // const response = await fetch('/api/organizations', {
-            //   method: 'POST',
-            //   credentials: 'include',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify({ name: orgName })
-            // });
-
-            // Simuler un délai
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Sauvegarder dans localStorage pour la démo
-            localStorage.setItem('userOrganization', JSON.stringify({
-                id: Date.now(),
-                name: orgName,
-                role: 'owner'
-            }));
+            const response = await organizationService.create(orgName);
 
             // Mettre à jour l'état
             setUserHasOrganization(true);
             setShowOrgModal(false);
 
             // Afficher un message de succès
-            alert(`Organisation "${orgName}" créée avec succès ! 🎉`);
+            toast.success(`Organisation "${orgName}" créée avec succès ! 🎉`);
 
         } catch (error) {
-            console.error('Erreur création organisation:', error);
-            alert('Erreur lors de la création de l\'organisation');
+            toast.error('Erreur lors de la création de l\'organisation');
         }
     };
 
@@ -236,8 +221,8 @@ const DashboardHome = () => {
                                     <span className={`text-sm font-semibold ${
                                         stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
                                     }`}>
-                    {stat.change}
-                  </span>
+                                        {stat.change}
+                                    </span>
                                 </div>
 
                                 <h3 className="text-2xl font-bold text-slate-900 mb-1">

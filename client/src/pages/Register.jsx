@@ -21,7 +21,6 @@ const Register = () => {
             defaultValues: {
                 username: '',
                 email: '',
-                company: '',
                 password: '',
                 confirmPassword: '',
                 terms: false
@@ -44,11 +43,11 @@ const Register = () => {
     // Fonction de soumission
     const onSubmit = async (data) => {
         // e.preventDefault();
-        const { username, email, company, password } = data;
+        const { username, email, password } = data;
         setIsLoading(true);
 
         try {
-            await authService.register({username, email, company, password});
+            await authService.register({username, email, password});
             toast.success('Inscription réussie !');
             setIsSuccess(true);
 
@@ -168,15 +167,6 @@ const Register = () => {
                                 />
                             </FormField>
                         </div>
-
-                        {/* Entreprise (optionnel) */}
-                        <FormField label="Entreprise (optionnel)" id="company" icon={Building} error={errors.company}>
-                            <Input
-                                id="company"
-                                placeholder="Votre entreprise"
-                                {...register('company')}
-                            />
-                        </FormField>
 
                         {/* Mot de passe */}
                         <FormField label="Mot de passe" id="password" icon={Lock} error={errors.password} password={password} required>

@@ -1,9 +1,25 @@
 import React, { useState } from 'react';
-import { Building, Plus, Users, X, ArrowRight } from 'lucide-react';
+import {Building, Plus, Users, X, ArrowRight} from 'lucide-react';
+import Input from "./Input.jsx";
+import FormField from "./FormField.jsx";
+import {useForm} from "react-hook-form";
+import organizationService from "../services/organization.service.js";
 
 const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onContinueWithout }) => {
     const [isCreating, setIsCreating] = useState(false);
-    const [orgName, setOrgName] = useState('');
+    const {
+        register,
+        formState: { errors },
+        handleSubmit,
+        watch,
+    } = useForm(
+        {
+            mode: 'onBlur',
+            defaultValues: {
+                companyName: ''
+            }
+        }
+    );
 
     // Fermer le modal si on clique en dehors (optionnel)
     const handleBackdropClick = (e) => {
@@ -14,17 +30,11 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onContinueWithout }) 
         }
     };
 
-    const handleCreateOrganization = async (e) => {
-        e.preventDefault();
-
-        if (!orgName.trim()) {
-            alert('Veuillez entrer un nom d\'organisation');
-            return;
-        }
+    const handleCreateOrganization = async (data) => {
 
         try {
-            await onCreateOrg(orgName);
-            setOrgName('');
+            const { name } = data;
+            await onCreateOrg(name);
             setIsCreating(false);
         } catch (error) {
             console.error('Erreur création organisation:', error);
@@ -41,7 +51,7 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onContinueWithout }) 
     return (
         // Backdrop
         <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-scale-in"
             onClick={handleBackdropClick}
         >
             {/* Modal */}
@@ -147,22 +157,25 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onContinueWithout }) 
                         </div>
 
                         {/* Form */}
-                        <form onSubmit={handleCreateOrganization} className="p-8 space-y-6">
+                        <form onSubmit={handleSubmit(handleCreateOrganization)} className="p-8 space-y-6">
                             <div>
-                                <label htmlFor="orgName" className="block text-sm font-medium text-slate-700 mb-2">
-                                    Nom de l'organisation *
-                                </label>
                                 <div className="relative">
-                                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                                    <input
-                                        type="text"
-                                        id="orgName"
-                                        value={orgName}
-                                        onChange={(e) => setOrgName(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Ex: Acme Corporation"
-                                        autoFocus
-                                    />
+                                    <FormField label="Nom de l'organisation" id="username" icon={Building} error={errors.name} required>
+                                        <Input
+                                            id="name"
+                                            placeholder="My company"
+                                            error={errors.name}
+                                            {...register('name', {
+                                                required: 'Ce champ est requis',
+                                                validate: {
+                                                    isUnique: async (v) => {
+                                                        const { data } = await organizationService.isNameTaken(v);
+                                                        return !data.isTaken || 'Ce nom est déjà prise. Veuillez en choisir un autre.';
+                                                    }
+                                                }
+                                            })}
+                                        />
+                                    </FormField>
                                 </div>
                                 <p className="mt-2 text-sm text-slate-500">
                                     Ce nom sera visible par tous les membres de votre organisation
@@ -212,23 +225,6 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onContinueWithout }) 
                     </>
                 )}
             </div>
-
-            {/* Animation CSS */}
-            <style jsx>{`
-                @keyframes scale-in {
-                  from {
-                    opacity: 0;
-                    transform: scale(0.9);
-                  }
-                  to {
-                    opacity: 1;
-                    transform: scale(1);
-                  }
-                }
-                .animate-scale-in {
-                  animation: scale-in 0.3s ease-out;
-                }
-            `}</style>
         </div>
     );
 };
