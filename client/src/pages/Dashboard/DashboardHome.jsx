@@ -7,7 +7,7 @@ import organizationService from "../../services/organization.service.js";
 import toast from "react-hot-toast";
 
 const DashboardHome = () => {
-    const { userData } = useUser();
+    const { userData, isLoggedIn } = useUser();
 
     // État pour le modal d'organisation
     const [showOrgModal, setShowOrgModal] = useState(false);
@@ -16,15 +16,18 @@ const DashboardHome = () => {
 
     // Vérifier si l'utilisateur a une organisation au montage
     useEffect(() => {
-        checkUserOrganization().then(r => {});
-    }, []);
+        if (isLoggedIn && userData) {
+            checkUserOrganization().then(r => {});
+        }
+    }, [userData, isLoggedIn]);
 
     // Fonction pour vérifier si l'utilisateur a une organisation
     const checkUserOrganization = async () => {
         setIsCheckingOrg(true);
-
         try {
-            const response = await membershipService.isUserMemberOfAnyOrganization();
+            const response = await membershipService.isUserMemberOfAnyOrganization(
+                localStorage.getItem('userIdLogged')
+            );
             const {hasOrganization} = await response.data;
             setUserHasOrganization(hasOrganization);
             if (!hasOrganization) {
@@ -42,9 +45,6 @@ const DashboardHome = () => {
     // Fonction appelée quand l'utilisateur crée une organisation
     const handleCreateOrganization = async (orgName) => {
         try {
-            console.log('Création de l\'organisation:', orgName);
-
-            // Ici tu ferais un appel API pour créer l'organisation
             const response = await organizationService.create(orgName);
 
             // Mettre à jour l'état
@@ -56,6 +56,44 @@ const DashboardHome = () => {
 
         } catch (error) {
             toast.error('Erreur lors de la création de l\'organisation');
+        }
+    };
+
+    const handleJoinOrganization = async (inviteCode, orgDetails) => {
+        try {
+            console.log('Rejoindre l\'organisation avec le code:', inviteCode);
+            console.log('Détails:', orgDetails);
+
+            // Ici tu ferais un appel API pour rejoindre l'organisation
+            // const response = await fetch('/api/invitations/accept', {
+            //   method: 'POST',
+            //   credentials: 'include',
+            //   headers: { 'Content-Type': 'application/json' },
+            //   body: JSON.stringify({ inviteCode })
+            // });
+
+            // Simuler un délai
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Sauvegarder dans localStorage pour la démo
+            localStorage.setItem('userOrganization', JSON.stringify({
+                id: Date.now(),
+                name: orgDetails.organizationName,
+                role: orgDetails.role.toLowerCase(),
+                invitedBy: orgDetails.invitedBy
+            }));
+
+            // Mettre à jour l'état
+            setUserHasOrganization(true);
+            setShowOrgModal(false);
+
+            // Afficher un message de succès
+            alert(`Vous avez rejoint "${orgDetails.organizationName}" avec succès ! 🎉`);
+
+        } catch (error) {
+            console.error('Erreur lors de l\'adhésion:', error);
+            alert('Erreur lors de l\'adhésion à l\'organisation');
+            throw error;
         }
     };
 
@@ -164,6 +202,7 @@ const DashboardHome = () => {
                 isOpen={showOrgModal}
                 onClose={() => setShowOrgModal(false)}
                 onCreateOrg={handleCreateOrganization}
+                onJoinOrg={handleJoinOrganization}
                 onContinueWithout={handleContinueWithout}
             />
 
@@ -173,7 +212,7 @@ const DashboardHome = () => {
                 {/* En-tête */}
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900">
-                        Bienvenue, {userData?.name || 'Utilisateur'} !
+                        Bienvenue, {userData?.username || 'Utilisateur'} !
                     </h1>
                     <p className="text-slate-600 mt-1">
                         Voici un aperçu de vos risques financiers en temps réel
@@ -184,7 +223,8 @@ const DashboardHome = () => {
                 {!userHasOrganization && (
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                         <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center
+                            flex-shrink-0">
                                 <Activity className="w-5 h-5 text-blue-600" />
                             </div>
                             <div className="flex-1">
@@ -192,11 +232,13 @@ const DashboardHome = () => {
                                     Vous n'avez pas encore d'organisation
                                 </h3>
                                 <p className="text-sm text-blue-700 mb-3">
-                                    Créez ou rejoignez une organisation pour collaborer avec votre équipe et accéder à toutes les fonctionnalités.
+                                    Créez ou rejoignez une organisation pour collaborer avec votre équipe et accéder
+                                    à toutes les fonctionnalités.
                                 </p>
                                 <button
                                     onClick={() => setShowOrgModal(true)}
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+                                    text-sm font-medium transition-colors"
                                 >
                                     Configurer mon organisation
                                 </button>
@@ -212,10 +254,12 @@ const DashboardHome = () => {
                         return (
                             <div
                                 key={index}
-                                className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-lg transition-shadow duration-200"
+                                className="bg-white rounded-xl shadow-sm border border-slate-200 p-6
+                                hover:shadow-lg transition-shadow duration-200"
                             >
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className={`w-12 h-12 rounded-lg ${getStatColor(stat.color)} flex items-center justify-center`}>
+                                    <div className={`w-12 h-12 rounded-lg ${getStatColor(stat.color)} flex 
+                                    items-center justify-center`}>
                                         <Icon className="w-6 h-6" />
                                     </div>
                                     <span className={`text-sm font-semibold ${
@@ -249,7 +293,8 @@ const DashboardHome = () => {
                             {recentRisks.map((risk) => (
                                 <div
                                     key={risk.id}
-                                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg
+                                    hover:bg-slate-100 transition-colors cursor-pointer"
                                 >
                                     <div className="flex-1">
                                         <h3 className="font-medium text-slate-900 mb-1">
@@ -259,14 +304,16 @@ const DashboardHome = () => {
                                             {risk.time}
                                         </p>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getSeverityColor(risk.severity)}`}>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium border 
+                                    ${getSeverityColor(risk.severity)}`}>
                     {risk.severity === 'high' ? 'Élevé' : risk.severity === 'medium' ? 'Moyen' : 'Faible'}
                   </span>
                                 </div>
                             ))}
                         </div>
 
-                        <button className="w-full mt-4 py-2 text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                        <button className="w-full mt-4 py-2 text-blue-600 hover:text-blue-700 font-medium
+                        transition-colors">
                             Voir tous les risques →
                         </button>
                     </div>
@@ -277,7 +324,8 @@ const DashboardHome = () => {
                             Évolution des risques
                         </h2>
 
-                        <div className="h-64 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg flex items-center justify-center">
+                        <div className="h-64 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg flex items-center
+                        justify-center">
                             <div className="text-center">
                                 <Activity className="w-12 h-12 text-blue-400 mx-auto mb-3" />
                                 <p className="text-slate-600">
@@ -300,7 +348,8 @@ const DashboardHome = () => {
                     <p className="text-blue-100 mb-6">
                         Utilisez notre outil d'analyse pour évaluer rapidement l'impact d'un nouveau facteur de risque
                     </p>
-                    <button className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    <button className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50
+                    transition-colors">
                         Lancer une analyse
                     </button>
                 </div>

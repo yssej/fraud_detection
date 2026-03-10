@@ -1,45 +1,22 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useUser } from '../context/userContext';
 import {
-    LayoutDashboard,
-    AlertTriangle,
-    User,
     LogOut,
     Menu,
     X,
     Bell
 } from 'lucide-react';
+import navItems from './navitems';
 
 const DashboardLayout = () => {
     const { userData, logout } = useUser();
-    const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    // Navigation items
-    const navItems = [
-        {
-            path: '/dashboard',
-            icon: LayoutDashboard,
-            label: 'Tableau de bord'
-        },
-        {
-            path: '/dashboard/risks',
-            icon: AlertTriangle,
-            label: 'Risques'
-        },
-        {
-            path: '/dashboard/profile',
-            icon: User,
-            label: 'Profil'
-        }
-    ];
 
     // Fonction de déconnexion
     const handleLogout = async () => {
         await logout();
-        navigate('/login');
     };
 
     // Vérifier si un lien est actif
@@ -89,16 +66,16 @@ const DashboardLayout = () => {
                         <div className="hidden md:flex items-center gap-3">
                             <div className="text-right">
                                 <p className="text-sm font-medium text-slate-900">
-                                    {userData?.name || 'Utilisateur'}
+                                    {userData?.username || 'Utilisateur'}
                                 </p>
                                 <p className="text-xs text-slate-500">
                                     {userData?.email}
                                 </p>
                             </div>
                             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold">
-                  {userData?.name?.charAt(0) || 'U'}
-                </span>
+                                <span className="text-white font-semibold">
+                                  {userData?.username?.charAt(0) || 'U'}
+                                </span>
                             </div>
                         </div>
                     </div>

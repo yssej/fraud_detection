@@ -48,11 +48,12 @@ const Login = () => {
                 setUserState(data);
                 setRedirectToReferrer(true);
                 setIsLoading(false);
+                localStorage.setItem("userIdLogged", data.user.id.toString());
             }, 1500)
         } catch (error) {
             setIsLoading(false);
             setLoginError(error.response?.data.message);
-            toast.error(error.response?.data.message);
+            toast.error("Erreur = ",error.response?.data.message);
         }
     }
 

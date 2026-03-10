@@ -18,7 +18,7 @@ const UnauthorizedRedirect = ({ redirectPath, state }) => {
     const hasChecked = useRef(false);
     useEffect(() => {
         if (hasChecked.current) return;
-        toast.error("Accès refusé. Veuillez vous connecter.");
+        toast("Veuillez vous connecter.");
         hasChecked.current = true;
     }, []);
 

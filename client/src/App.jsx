@@ -40,8 +40,8 @@ function App() {
                     <Route path="/dashboard" element={<DashboardLayout />}>
                         {/* Les routes enfants sont placées DIRECTEMENT ici */}
                         <Route index element={<DashboardHome />} />
-                        <Route path="risk" element={<RiskPage />} />
-                        <Route path="profiles" element={<ProfilePage />} /> {/* Parenthèse fermée + path relatif */}
+                        <Route path="risks" element={<RiskPage />} />
+                        <Route path="profile" element={<ProfilePage />} /> {/* Parenthèse fermée + path relatif */}
                         <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>

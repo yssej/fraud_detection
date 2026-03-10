@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useRef, useState} from "react";
 import authService from "../services/auth.service.js";
 import WithAxios from "../helpers/WithAxios.js";
+import history from "../helpers/history.js";
 
 const UserContext = createContext();
 
@@ -13,31 +14,31 @@ const UserProvider = ({children}) => {
     useEffect(() => {
         if (hasChecked.current) return;
         if(localStorage.getItem("isLoggedIn") === "true") {
+            checkAuth().then(r => {});
             setIsLoggedIn(true);
             setIsLoading(false);
-            const checkAuth = async () => {
-                try {
-                    // Imaginons que tu vérifies le token ici
-                    const res = await authService.getCurrentUser();
-                    if (res?.data) {
-                        setUserData(res.data);
-                        setIsLoggedIn(true);
-                    }
-                } catch (err) {
-                    console.error("Access token expired or invalid");
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            checkAuth();
             hasChecked.current = true;
         }
         setIsLoading(false);
-    }, [])
+    }, []);
+
+    const checkAuth = async () => {
+        try {
+            // Imaginons que tu vérifies le token ici
+            const res = await authService.getCurrentUser();
+            if (res?.data) {
+                setUserData(res.data);
+            }
+        } catch (err) {
+            console.error("Access token expired or invalid");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         if(isLoggedIn){
-            authService.getCurrentUser().then((res) => {setUserData(res?.data)});
+            checkAuth().then(r => {});
         }
     }, [isLoggedIn]);
 
@@ -49,6 +50,7 @@ const UserProvider = ({children}) => {
     }
 
     const logout = async () => {
+        await history.push('/login');
         setIsLoading(true);
         setUserData(null);
         setIsLoggedIn(false);
