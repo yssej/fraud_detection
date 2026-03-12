@@ -5,4 +5,8 @@ const isUserMemberOfAnyOrganization = async (userId) => {
     return membership !== 0;
 }
 
-module.exports = {isUserMemberOfAnyOrganization};
+const joinOrganization = async (userId, organizationId) => {
+    await Membership.create({userId, organizationId, role: 'Analyst'});
+}
+
+module.exports = {isUserMemberOfAnyOrganization, joinOrganization};

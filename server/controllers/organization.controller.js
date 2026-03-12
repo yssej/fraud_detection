@@ -13,9 +13,15 @@ const isNameTaken = asyncHandler(async (req, res, next) => {
     const {name} = req.params;
     const isTaken = await organisationService.isNameTaken(name);
     res.json({isTaken});
-})
+});
+
+const findAllNames = asyncHandler(async (req, res, next) => {
+    const organizations = await organisationService.findAllNames();
+    res.json(organizations);
+});
 
 module.exports = {
     createOrganization,
-    isNameTaken
+    isNameTaken,
+    findAllNames
 }

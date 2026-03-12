@@ -8,6 +8,10 @@ class OrganizationService {
     async isNameTaken(name) {
         return await API.get(`/organization/isNameTaken/${name}`);
     }
+
+    async findAllNames() {
+        return await API.get('/organization/allNames');
+    }
 }
 
 export default new OrganizationService();

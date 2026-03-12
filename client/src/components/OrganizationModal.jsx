@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {Building, Plus, Users, X, ArrowRight} from 'lucide-react';
 import Input from "./Input.jsx";
 import FormField from "./FormField.jsx";
 import {useForm} from "react-hook-form";
 import organizationService from "../services/organization.service.js";
-import JoinOrganizationView from "./JoinOrganizationView.jsx";
 
 const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onJoinOrg, onContinueWithout }) => {
-    const [isCreating, setIsCreating] = useState(false);
     const [view, setView] = useState('choice'); // 'choice', 'create', 'join'
+    const [organizationsName, setOrganizationsName] = useState([]);
+
+    useEffect(() => {
+        findAllOrganizationsName().then(r => {});
+    }, []);
+
+    const findAllOrganizationsName = async () => {
+        try {
+            const allNames = await organizationService.findAllNames();
+            const {data} = allNames;
+            setOrganizationsName(data);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des noms d\'organisations:', error);
+        }
+    }
+
     const {
         register,
         formState: { errors },
@@ -37,15 +51,16 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onJoinOrg, onContinue
         try {
             const { name } = data;
             await onCreateOrg(name);
-            setIsCreating(false);
         } catch (error) {
             console.error('Erreur création organisation:', error);
         }
     };
 
-    const handleJoinOrganization = async (inviteCode, orgDetails) => {
+    const handleJoinOrganization = async (data) => {
         try {
-            await onJoinOrg(inviteCode, orgDetails);
+            const { name } = data;
+            console.log('Rejoindre l\'organisation avec le nom:', name);
+            await onJoinOrg(name);
             setView('choice');
         } catch (error) {
             console.error('Erreur rejoindre organisation:', error);
@@ -68,7 +83,8 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onJoinOrg, onContinue
             onClick={handleBackdropClick}
         >
             {/* Modal */}
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-full overflow-y-auto animate-scale-in">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-full overflow-y-auto
+            animate-scale-in">
 
                 {view === 'choice' && (
                     // Vue principale : Choix entre créer ou continuer
@@ -259,10 +275,96 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onJoinOrg, onContinue
 
                 {view === 'join' && (
                     // Vue rejoindre : Composant JoinOrganizationView
-                    <JoinOrganizationView
-                        onJoinOrg={handleJoinOrganization}
-                        onBack={() => setView('choice')}
-                    />
+                    <>
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 text-white">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold">
+                                    Rejoindre une organisation
+                                </h2>
+                                <button
+                                    onClick={() => setView('choice')}
+                                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Form */}
+                        <form onSubmit={handleSubmit(handleJoinOrganization)} className="p-8 space-y-6">
+                            <div>
+                                <div className="relative">
+                                    <FormField label="Nom de l'organisation" id="username" icon={Building}
+                                               error={errors.name} required>
+                                        <Input
+                                            id="name"
+                                            placeholder="My company"
+                                            list="organizations"
+                                            error={errors.name}
+                                            {...register('name', {
+                                                required: 'Ce champ est requis',
+                                                validate: {
+                                                    doesExist: async (v) => {
+                                                        return organizationsName.includes(v) || 'Cette organisation ' +
+                                                            'n\'existe pas. Veuillez en choisir une autre.';
+                                                    }
+                                                }
+                                            })}
+                                        />
+                                        <datalist id="organizations">
+                                            {organizationsName.map(name => (
+                                                <option key={name} value={name}>
+                                                    {name}
+                                                </option>
+                                            ))}
+                                        </datalist>
+                                    </FormField>
+                                </div>
+                                <p className="mt-2 text-sm text-slate-500">
+                                    Ce nom sera visible par tous les membres de votre organisation
+                                </p>
+                            </div>
+
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 className="font-semibold text-blue-900 mb-2">
+                                    Ce que vous pourrez faire ensuite :
+                                </h4>
+                                <ul className="space-y-2 text-sm text-blue-800">
+                                    <li className="flex items-start">
+                                        <span className="text-blue-600 mr-2">✓</span>
+                                        Voire toutes les transactions de votre organisation
+                                    </li>
+                                    <li className="flex items-start">
+                                        <span className="text-blue-600 mr-2">✓</span>
+                                        Voire les alertes générées par l'IA
+                                    </li>
+                                    <li className="flex items-start">
+                                        <span className="text-blue-600 mr-2">✓</span>
+                                        Accéder aux tableaux de bord analytiques
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setView('choice')}
+                                    className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700
+                                    rounded-lg font-semibold transition-colors"
+                                >
+                                    Retour
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white
+                                    rounded-lg font-semibold transition-colors shadow-lg hover:shadow-xl"
+                                >
+                                    Créer l'organisation
+                                </button>
+                            </div>
+                        </form>
+                    </>
                 )}
 
             </div>

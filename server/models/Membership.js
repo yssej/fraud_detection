@@ -20,6 +20,11 @@ const Membership = sequelize.define("Membership", {
     role: {
         type: Datatypes.ENUM("Admin", "Analyst"),
         allowNull: false
+    },
+    status: {
+        type: Datatypes.ENUM("Pending", "Accepted", "Declined"),
+        defaultValue: "Pending",
+        allowNull: false
     }
 }, {
     timestamps: false

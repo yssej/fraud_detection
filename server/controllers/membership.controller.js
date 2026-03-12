@@ -7,4 +7,11 @@ const isUserMemberOfAnyOrganization = asyncHandler(async (req, res, next) => {
     res.json({hasOrganization});
 });
 
-module.exports = {isUserMemberOfAnyOrganization};
+const joinOrganization = asyncHandler(async (req, res, next) => {
+    const userId = req.user.id;
+    const organizationId = req.params.organizationId;
+    await membershipService.joinOrganization(userId, organizationId);
+    res.status(201).json({"message": "User joined organization successfully."});
+})
+
+module.exports = {isUserMemberOfAnyOrganization, joinOrganization};

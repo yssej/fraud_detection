@@ -22,7 +22,13 @@ const create = async (userId, name) => {
     });
 }
 
+const findAllNames = async () => {
+    const organizations = await Organization.findAll({ attributes: ['name'] });
+    return organizations.map(org => org.name);
+}
+
 module.exports = {
     create,
-    isNameTaken
+    isNameTaken,
+    findAllNames
 };
