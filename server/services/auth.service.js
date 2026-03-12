@@ -17,8 +17,8 @@ const login = async (emailOrUsername, password) => {
         }
     });
     if(!user) throw new BadRequestError("Invalid credentials");
-    const isMatch = bcrypt.compare(user.password, password);
-    if(!isMatch) throw new BadRequestError("Invalid credentials");
+    const isMatch = await bcrypt.compare(password, user.password);
+    if(!isMatch) throw new BadRequestError("Invalid password");
 
     const accessToken = generateAccessToken({
         id: user.id,
@@ -52,7 +52,7 @@ const register = async (user) => {
     if(await isEmailTaken(user.email)) throw new BadRequestError("Email already taken");
     if(await isUsernameTaken(user.username)) throw new BadRequestError("Username already taken");
     user.password = await bcrypt.hash(user.password, 10);
-    User.create(user);
+    await User.create(user);
 }
 
 const refresh = async (token) => {
@@ -61,6 +61,7 @@ const refresh = async (token) => {
     if(!storedToken) throw new UnauthorizedError("Invalid refresh token.");
     if(storedToken.expiredAt < new Date()) {
         await RefreshToken.destroy({where: {token}});
+        console.log('Your refresh token has expired');
         throw new UnauthorizedError("Refresh token expired.");
     }
     const refresh = storedToken.token;
@@ -69,6 +70,7 @@ const refresh = async (token) => {
     const newAccessToken = generateAccessToken({
         id: user.id
     });
+    console.log("AccessToken refreshed successfully");
     return { accessToken: newAccessToken }
 }
 
