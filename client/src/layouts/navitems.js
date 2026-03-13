@@ -1,4 +1,4 @@
-import {AlertTriangle, LayoutDashboard, User} from "lucide-react";
+import {AlertTriangle, LayoutDashboard, User, Users} from "lucide-react";
 
 const navItems = [
     {
@@ -15,6 +15,11 @@ const navItems = [
         path: '/dashboard/profile',
         icon: User,
         label: 'Profil'
+    },
+    {
+        path: '/dashboard/organization/requests',
+        icon: Users,
+        label: 'Demandes d\'organisation'
     }
 ];
 

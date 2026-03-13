@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Building, Plus, Users, X, ArrowRight} from 'lucide-react';
+import {Building, Plus, Users, X, ArrowRight, ChevronDown} from 'lucide-react';
 import Input from "./Input.jsx";
 import FormField from "./FormField.jsx";
 import {useForm} from "react-hook-form";
@@ -303,20 +303,20 @@ const OrganizationModal = ({ isOpen, onClose, onCreateOrg, onJoinOrg, onContinue
                                             list="organizations"
                                             error={errors.name}
                                             {...register('name', {
-                                                required: 'Ce champ est requis',
+                                                required: 'Le nom de l’organisation est obligatoire',
                                                 validate: {
-                                                    doesExist: async (v) => {
-                                                        return organizationsName.includes(v) || 'Cette organisation ' +
-                                                            'n\'existe pas. Veuillez en choisir une autre.';
-                                                    }
+                                                    doesExist: (v) =>
+                                                        organizationsName.includes(v) || 'Cette organisation n\'est pas référencée.'
                                                 }
                                             })}
                                         />
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-focus-within:text-purple-500">
+                                            <ChevronDown className="w-4 h-4" />
+                                        </div>
+
                                         <datalist id="organizations">
-                                            {organizationsName.map(name => (
-                                                <option key={name} value={name}>
-                                                    {name}
-                                                </option>
+                                            {organizationsName.map((name) => (
+                                                <option key={name} value={name} />
                                             ))}
                                         </datalist>
                                     </FormField>

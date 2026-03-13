@@ -158,11 +158,6 @@ const Login = () => {
                                     name="password"
                                     {...register("password", {
                                         required: true,
-                                        pattern: {
-                                            value: /^(?=.*[A-Z])(?=.*\d)/,
-                                            message: "Doit inclure au moins une majuscule et un chiffre"
-                                        },
-                                        minLength: 6,
                                     })}
                                     className={`w-full pl-11 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                         errors.password
@@ -189,35 +184,6 @@ const Login = () => {
                                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                                     <AlertCircle className="w-4 h-4" />
                                     Veuillez entrer votre mot de passe.
-                                </p>
-                            )}
-                            {errors?.password && errors?.password.type === "pattern" && (
-                                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                                    <AlertCircle className="w-4 h-4" />
-                                    {errors?.password.message}
-                                </p>
-                            )}
-                            {errors?.password && errors?.password.type === "minLength" && (
-                                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                                    <AlertCircle className="w-4 h-4" />
-                                    Le mot de passe doit contenir au moins 6 caractères.
-                                </p>
-                            )}
-                        </div>
-                        <div className="mt-3">
-                            {/* Barre de progression */}
-                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full transition-all duration-500 ${strengthConfig[strength].color}`}
-                                    style={{ width: strengthConfig[strength].width }}
-                                ></div>
-                            </div>
-
-                            {/* Libellé de force */}
-                            {watch('password') && (
-                                <p className="text-xs mt-1 text-slate-500 flex justify-between">
-                                    <span>Force : <strong>{strengthConfig[strength].label}</strong></span>
-                                    {strength < 3 && <span>Ajoutez des chiffres ou symboles</span>}
                                 </p>
                             )}
                         </div>

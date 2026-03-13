@@ -59,29 +59,12 @@ const DashboardHome = () => {
         }
     };
 
-    const handleJoinOrganization = async (inviteCode, orgDetails) => {
+    const handleJoinOrganization = async (organizationId) => {
         try {
-            console.log('Rejoindre l\'organisation avec le code:', inviteCode);
-            console.log('Détails:', orgDetails);
 
             // Ici tu ferais un appel API pour rejoindre l'organisation
-            // const response = await fetch('/api/invitations/accept', {
-            //   method: 'POST',
-            //   credentials: 'include',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify({ inviteCode })
-            // });
-
-            // Simuler un délai
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Sauvegarder dans localStorage pour la démo
-            localStorage.setItem('userOrganization', JSON.stringify({
-                id: Date.now(),
-                name: orgDetails.organizationName,
-                role: orgDetails.role.toLowerCase(),
-                invitedBy: orgDetails.invitedBy
-            }));
+            const response = await membershipService.joinOrganization(organizationId);
+            console.log('Réponse de l\'appel API:', response.data);
 
             // Mettre à jour l'état
             setUserHasOrganization(true);
@@ -305,9 +288,9 @@ const DashboardHome = () => {
                                         </p>
                                     </div>
                                     <span className={`px-3 py-1 rounded-full text-xs font-medium border 
-                                    ${getSeverityColor(risk.severity)}`}>
-                    {risk.severity === 'high' ? 'Élevé' : risk.severity === 'medium' ? 'Moyen' : 'Faible'}
-                  </span>
+                                        ${getSeverityColor(risk.severity)}`}>
+                                        {risk.severity === 'high' ? 'Élevé' : risk.severity === 'medium' ? 'Moyen' : 'Faible'}
+                                    </span>
                                 </div>
                             ))}
                         </div>

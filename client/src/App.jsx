@@ -14,7 +14,7 @@ import DashboardHome from "./pages/Dashboard/DashboardHome.jsx";
 import RiskPage from "./pages/Dashboard/RiskPage.jsx";
 import ProfilePage from "./pages/Dashboard/ProfilePage.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
-
+import OrganizationRequestsPage from "./pages/OrganizationRequestsPage.jsx";
 
 
 function App() {
@@ -42,6 +42,7 @@ function App() {
                         <Route index element={<DashboardHome />} />
                         <Route path="risks" element={<RiskPage />} />
                         <Route path="profile" element={<ProfilePage />} /> {/* Parenthèse fermée + path relatif */}
+                        <Route path="organization/requests" element={<OrganizationRequestsPage />} />
                         <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
