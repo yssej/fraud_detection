@@ -24,7 +24,6 @@
                         }
 
                         if(error.response?.status === 401 && !originalRequest._retry) {
-                            console.log('Access token expired ', originalRequest._retry);
                             try {
                                 originalRequest._retry = true;
                                 await API.post('/auth/refresh');

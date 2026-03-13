@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, User, Building, CheckCircle2, X } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, User, CheckCircle2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import userService from "../services/user.service.js";
 import authService from "../services/auth.service.js";
@@ -15,13 +15,13 @@ const Register = () => {
         formState: { errors },
         handleSubmit,
         watch,
+        reset,
     } = useForm(
         {
             mode: 'onBlur',
             defaultValues: {
                 username: '',
                 email: '',
-                company: '',
                 password: '',
                 confirmPassword: '',
                 terms: false
@@ -44,12 +44,13 @@ const Register = () => {
     // Fonction de soumission
     const onSubmit = async (data) => {
         // e.preventDefault();
-        const { username, email, company, password } = data;
+        const { username, email, password } = data;
         setIsLoading(true);
 
         try {
-            await authService.register({username, email, company, password});
+            await authService.register({username, email, password});
             toast.success('Inscription réussie !');
+            reset();
             setIsSuccess(true);
 
         } catch (error) {
@@ -169,15 +170,6 @@ const Register = () => {
                             </FormField>
                         </div>
 
-                        {/* Entreprise (optionnel) */}
-                        <FormField label="Entreprise (optionnel)" id="company" icon={Building} error={errors.company}>
-                            <Input
-                                id="company"
-                                placeholder="Votre entreprise"
-                                {...register('company')}
-                            />
-                        </FormField>
-
                         {/* Mot de passe */}
                         <FormField label="Mot de passe" id="password" icon={Lock} error={errors.password} password={password} required>
                             <Input
@@ -219,10 +211,10 @@ const Register = () => {
                             />
                             <button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)}
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400"
                             >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
                             {watch('confirmPassword') && !errors?.confirmPassword && (
                                 <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
